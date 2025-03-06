@@ -29,7 +29,11 @@ const ChatHistory = ({
             alt={`${chat.sender} icon`}
             className="chat-icon1"
           />
-          <ChatResponse message={chat.message} videoLink={chat.videoLink} />
+          <ChatResponse
+            message={chat.message}
+            videoLink={chat.videoLink}
+            isAssistant={chat.sender === "assistant"}
+          />
 
           {chat.images && (
             <div className="image-container">

@@ -27,7 +27,7 @@ const Main = (props) => {
 
     try {
       const response = await fetch(
-        "https://fastapi-app3-855220130399.us-central1.run.app/api/query",
+        "https://fastapi-app6-855220130399.us-central1.run.app/api/query",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

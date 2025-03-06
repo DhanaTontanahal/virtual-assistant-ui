@@ -19,7 +19,7 @@ const AccountBalance = () => {
       // Fetch account balance from the backend
       axios
         .get(
-          `https://va-nodejs-app-855220130399.us-central1.run.app/api/account-balance?email=urwithdhanu@gmail.com`
+          `https://va-nodejs-app2-855220130399.us-central1.run.app/api/account-balance?email=urwithdhanu@gmail.com`
         )
         .then((response) => {
           console.log(response.data);

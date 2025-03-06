@@ -1,18 +1,17 @@
 import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
-import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 
-const ChatResponse = ({ message, videoLink, isAssistant }) => {
+const ChatResponse = ({ message, videoLink }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [feedback, setFeedback] = useState(null);
 
   if (!message && !videoLink) return null;
 
+  // Convert YouTube URL into an Embed URL
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
     const regExp =
-      /(?:youtube\.com\/(?:.*v=|.*\/|.*embed\/)||youtu.be\/)([^"&?\/\s]+)/;
+      /(?:youtube\.com\/(?:.*v=|.*\/|.*embed\/)|youtu.be\/)([^"&?\/\s]+)/;
     const match = url.match(regExp);
     const videoId = match ? match[1] : null;
     return videoId
@@ -32,17 +31,22 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
         transition={{ duration: 0.5 }}
         className="p-4 bg-gray-100 border border-gray-300 rounded-md shadow-md mt-2"
       >
+        {/* Display Message */}
         {message && (
           <>
             {(() => {
               try {
-                const parsedMessage = JSON.parse(message);
+                const parsedMessage = JSON.parse(message); // ✅ Parse message safely
+                console.log("parsedMessage");
+                console.log(parsedMessage);
                 return (
                   <div>
+                    {/* Render the answer */}
                     <ReactMarkdown className="text-gray-800 leading-relaxed">
                       {parsedMessage.answer}
                     </ReactMarkdown>
 
+                    {/* Render video if available */}
                     {parsedMessage.videoLink && (
                       <div className="mt-3">
                         <iframe
@@ -60,6 +64,7 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
                       </div>
                     )}
 
+                    {/* Render additionalHelp if available */}
                     {parsedMessage.additionalHelp && (
                       <p className="text-sm text-gray-500 mt-2">
                         {parsedMessage.additionalHelp}
@@ -68,6 +73,7 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
                   </div>
                 );
               } catch (e) {
+                // Fallback for invalid JSON
                 return (
                   <ReactMarkdown className="text-gray-800 leading-relaxed">
                     {message}
@@ -78,6 +84,7 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
           </>
         )}
 
+        {/* Video Thumbnail (Click to Open Modal) */}
         {videoLink && (
           <div
             className="video-thumbnail mt-3"
@@ -106,33 +113,21 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
             <div className="play-button-overlay">▶</div>
           </div>
         )}
-
-        {isAssistant && (
-          <div className="feedback-section">
-            <span>Was this helpful?</span>
-            <FaThumbsUp
-              className={`feedback-icon ${feedback === "like" ? "active" : ""}`}
-              onClick={() => setFeedback("like")}
-            />
-            <FaThumbsDown
-              className={`feedback-icon ${
-                feedback === "dislike" ? "active" : ""
-              }`}
-              onClick={() => setFeedback("dislike")}
-            />
-          </div>
-        )}
       </motion.div>
 
+      {/* Video Modal Popup */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            {/* Close Button */}
             <span
               className="close-button"
               onClick={() => setIsModalOpen(false)}
             >
               ✖
             </span>
+
+            {/* YouTube Video Embed */}
             {isYouTubeVideo ? (
               <iframe
                 width="100%"
@@ -144,6 +139,7 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
                 allowFullScreen
               ></iframe>
             ) : (
+              /* Direct Video Embed */
               <video width="100%" height="400" controls autoPlay>
                 <source src={videoLink} type="video/mp4" />
                 Your browser does not support the video tag.
@@ -153,11 +149,13 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
         </div>
       )}
 
+      {/* Styling */}
       <style jsx>{`
         .video-thumbnail {
           position: relative;
           display: inline-block;
         }
+
         .play-button-overlay {
           position: absolute;
           top: 50%;
@@ -170,26 +168,52 @@ const ChatResponse = ({ message, videoLink, isAssistant }) => {
           border-radius: 50%;
           cursor: pointer;
         }
-        .feedback-section {
+
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.7);
           display: flex;
           align-items: center;
-          gap: 10px;
-          padding-top: 8px;
-          font-size: 14px;
-          color: #666;
-          margin-top: 10px;
+          justify-content: center;
+          z-index: 1000;
         }
-        .feedback-icon {
-          font-size: 18px;
+
+        .modal-content {
+          position: relative;
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          max-width: 600px;
+          width: 90%;
+          box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-button {
+          position: absolute;
+          top: 10px;
+          right: 15px;
+          font-size: 24px;
           cursor: pointer;
-          color: #999;
-          transition: color 0.2s ease-in-out;
+          color: #333;
+          background: white;
+          border: 2px solid #999;
+          border-radius: 50%;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s ease-in-out;
         }
-        .feedback-icon:hover {
-          color: #000;
-        }
-        .feedback-icon.active {
-          color: #007bff;
+
+        .close-button:hover {
+          color: white;
+          background: red;
+          border: 2px solid red;
         }
       `}</style>
     </>
